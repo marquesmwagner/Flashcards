@@ -14,11 +14,13 @@ namespace Flashcards
             try
             {
                 SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-                builder.DataSource = "Server=(LocalDb)\\MSSQLLocalDB";
+                builder.DataSource = "(LocalDb)\\MSSQLLocalDB";
+                builder.InitialCatalog = "FlashCardsDB";
 
-                using (SqlConnection connection = new SqlConnection(builder.DataSource))
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
+                    
                     String sql = @"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'FlashCardsDB')
                                    BEGIN
                                    CREATE DATABASE FlashCardsDB;
@@ -27,10 +29,33 @@ namespace Flashcards
                     {
                         command.ExecuteNonQuery();
                     }
+
+                    sql = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Stacks')
+                            CREATE TABLE Stacks (
+                            StackId INT NOT NULL PRIMARY KEY,
+                            Name VARCHAR(100) NOT NULL UNIQUE)";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+
+                    sql = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'FlashCards')
+                            CREATE TABLE FlashCards (
+                            FlashCardId INT NOT NULL PRIMARY KEY,
+                            Question VARCHAR(30) NOT NULL,
+                            Answer VARCHAR(30) NOT NULL,
+                            StackId INT NOT NULL FOREIGN KEY REFERENCES Stacks(StackId) ON DELETE CASCADE ON UPDATE CASCADE)";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+
                     connection.Close();
                 }
+
+
             }
-            catch(Exception e)
+            catch(SqlException e)
             {
                 Console.WriteLine(e.Message);
             }
