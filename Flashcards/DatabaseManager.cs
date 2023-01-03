@@ -15,15 +15,15 @@ namespace Flashcards
             {
                 SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
                 builder.DataSource = "(LocalDb)\\MSSQLLocalDB";
-                builder.InitialCatalog = "FlashCardsDB";
+                builder.InitialCatalog = "FlashcardsDB";
 
                 using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
                 {
                     connection.Open();
                     
-                    String sql = @"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'FlashCardsDB')
+                    String sql = @"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'FlashcardsDB')
                                    BEGIN
-                                   CREATE DATABASE FlashCardsDB;
+                                   CREATE DATABASE FlashcardsDB;
                                    END";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -39,8 +39,8 @@ namespace Flashcards
                         command.ExecuteNonQuery();
                     }
 
-                    sql = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'FlashCards')
-                            CREATE TABLE FlashCards (
+                    sql = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Flashcards')
+                            CREATE TABLE Flashcards (
                             FlashCardId INT NOT NULL PRIMARY KEY,
                             Question VARCHAR(30) NOT NULL,
                             Answer VARCHAR(30) NOT NULL,
